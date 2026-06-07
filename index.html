@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Envelopes of Wisdom</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #311042);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #fda4af, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        /* Grid Layout for Envelopes */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 600px;
+            padding: 10px;
+        }
+
+        /* Envelope Button Wrapper */
+        .envelope-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 400px;
+        }
+
+        /* The Interactive Envelope Button */
+        .envelope-btn {
+            position: relative;
+            width: 80px;
+            height: 55px;
+            background-color: #f43f5e;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: none;
+            outline: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Envelope Flap */
+        .envelope-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-top: 32px solid #fda4af;
+            transform-origin: top;
+            transition: transform 0.3s ease;
+            z-index: 5;
+        }
+
+        /* Envelope Front Pocket */
+        .envelope-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-left: 40px solid #e11d48;
+            border-right: 40px solid #e11d48;
+            border-bottom: 28px solid #e11d48;
+            border-radius: 0 0 4px 4px;
+            z-index: 4;
+        }
+
+        /* Hover & Active Tap Effects */
+        .envelope-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(244, 63, 94, 0.4);
+        }
+
+        .envelope-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Number Label under the envelope */
+        .envelope-label {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* Modal / Pop-up styling */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 85%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 35px 25px;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+
+        .modal.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .tag-motto { background: #3b82f6; }
+        .tag-quote { background: #10b981; }
+        .tag-rizz { background: #ec4899; }
+        .tag-whatif { background: #f59e0b; }
+        .tag-philosophy { background: #8b5cf6; }
+
+        .message-text {
+            font-size: 1.3rem;
+            color: #1e293b;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .close-btn {
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #0f172a;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+            z-index: 99;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Pick an Envelope</h1>
+        <p>Each one holds a hidden message</p>
+    </header>
+
+    <div class="grid-container" id="grid"></div>
+
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    <div class="modal" id="modal">
+        <div class="category-tag" id="modal-tag">Category</div>
+        <div class="message-text" id="modal-text">"Your text here..."</div>
+        <button class="close-btn" onclick="closeModal()">Close</button>
+    </div>
+
+    <script>
+        const pool = {
+            motto: [
+                "Make it happen, shock everyone.",
+                "Action cures fear.",
+                "Die with memories, not dreams.",
+                "Simplicity is the ultimate sophistication."
+            ],
+            quote: [
+                "The only way to do great work is to love what you do. — Steve Jobs",
+                "Believe you can and you're halfway there. — Theodore Roosevelt",
+                "Be yourself; everyone else is already taken. — Oscar Wilde"
+            ],
+            rizz: [
+                "Are you a magician? Because whenever I look at you, everyone else disappears.",
+                "Do you have a map? I keep getting lost in your eyes.",
+                "Are you a keyboard? Because you're just my type.",
+                "My data plan is unlimited, but I'd still spend all my bandwidth on you."
+            ],
+            whatif: [
+                "What if everything you're going through is preparing you for what you asked for?",
+                "What if sound had colors and colors had taste?",
+                "What if time is just an illusion to keep everything from happening at once?",
+                "What if your dreams are actually glimpses of your alternate reality self?"
+            ],
+            philosophy: [
+                "The unexamined life is not worth living. — Socrates",
+                "We are what we repeatedly do. Excellence, then, is not an act, but a habit. — Aristotle",
+                "He who has a why to live can bear almost any how. — Friedrich Nietzsche",
+                "Man is condemned to be free. — Jean-Paul Sartre"
+            ]
+        };
+
+        const categories = ['motto', 'quote', 'rizz', 'whatif', 'philosophy'];
+        const totalEnvelopes = 12; // Change this to add more or fewer buttons
+        const grid = document.getElementById('grid');
+
+        // Generate the static buttons dynamically
+        for (let i = 1; i <= totalEnvelopes; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'envelope-wrapper';
+
+            const button = document.createElement('button');
+            button.className = 'envelope-btn';
+            button.setAttribute('aria-label', `Envelope ${i}`);
+            
+            // Instantly handles taps on mobile browsers without layout movement lag
+            button.addEventListener('click', () => {
+                openEnvelope();
+            });
+
+            const label = document.createElement('div');
+            label.className = 'envelope-label';
+            label.innerText = `#${i}`;
+
+            wrapper.appendChild(button);
+            wrapper.appendChild(label);
+            grid.appendChild(wrapper);
+        }
+
+        function openEnvelope() {
+            // Pick a completely random category and a random message from it
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            const messages = pool[randomCat];
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+            showModal(randomCat, randomMessage);
+        }
+
+        function showModal(category, text) {
+            const modal = document.getElementById('modal');
+            const overlay = document.getElementById('overlay');
+            const tag = document.getElementById('modal-tag');
+            const content = document.getElementById('modal-text');
+
+            tag.className = `category-tag tag-${category}`;
+            tag.innerText = category === 'whatif' ? 'What If?' : category;
+            content.innerText = text;
+
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
